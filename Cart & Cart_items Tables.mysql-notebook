@@ -2,7 +2,7 @@
     "type": "MySQLNotebook",
     "version": "1.0",
     "caption": "DB Notebook",
-    "content": "\\about\nshow DATABASES;\nuse pc_ecommerce;\nshow tables;\nCREATE TABLE cart (\n  id          CHAR(36)    NOT NULL DEFAULT (UUID()),\n  user_id     CHAR(36)    NOT NULL,\n  created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\n  PRIMARY KEY (id),\n  UNIQUE KEY uq_cart_user_id (user_id),\n  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE\n);\nCREATE TABLE cart_items (\n  id          CHAR(36)        NOT NULL DEFAULT (UUID()),\n  cart_id     CHAR(36)        NOT NULL,\n  product_id  CHAR(36)        NOT NULL,\n  quantity    INT UNSIGNED    NOT NULL DEFAULT 1,\n  added_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\n  PRIMARY KEY (id),\n  UNIQUE KEY uq_cart_product (cart_id, product_id),\n  FOREIGN KEY (cart_id) REFERENCES cart(id) ON DELETE CASCADE,\n  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,\n  INDEX idx_cart_items_cart_id (cart_id),\n  INDEX idx_cart_items_product_id (product_id),\n\n  CHECK (quantity > 0)\n);\nshow tables;\ndesc cart;\ndesc cart_items;\nSELECT * from users limit 10 OFFSET 0;\nSELECT id FROM cart WHERE user_id = '02416024-162f-49c1-9b1e-001398b39474';\n\nSELECT COUNT(*) AS total_customers FROM users WHERE role = 'customer';\nINSERT INTO cart (id, user_id)\nSELECT UUID(), id\nFROM users\nWHERE role = 'customer'\n  AND deleted_at IS NULL\n  AND id NOT IN (SELECT user_id FROM cart);\nSELECT COUNT(*) AS total_carts FROM cart;\nSELECT * from users where role='customer' and deleted_at IS NOT Null;\nSELECT * from cart;\nSELECT id AS cart_id, user_id FROM cart LIMIT 1;\nSELECT id AS product_id, name, price FROM products WHERE status = 'active' LIMIT 1;\n\nINSERT INTO cart_items (cart_id, product_id, quantity)\nVALUES ('cf2e79d8-6c84-11f1-8d71-2c9c583aa7d0', '000902be-a67f-4f87-b09d-5db7888e371d', 2);\nSELECT * from cart_items;\nSELECT\n  ci.id AS cart_item_id,\n  p.name,\n  p.thumbnail_url,\n  ci.quantity,\n  COALESCE(p.discount_price, p.price) AS unit_price,\n  ci.quantity * COALESCE(p.discount_price, p.price) AS total_amount\nFROM cart_items ci\nJOIN products p ON ci.product_id = p.id\nWHERE ci.cart_id = 'cf2e79d8-6c84-11f1-8d71-2c9c583aa7d0';\nSELECT COUNT(*) AS total_cart_items FROM cart_items;\nSELECT * FROM cart_items WHERE quantity > 1;\nSELECT SUM(quantity) AS total_units_in_carts FROM cart_items;\nUPDATE cart_items SET quantity = 3 WHERE id = 'e6ecab64-6c86-11f1-8d71-2c9c583aa7d0';\n\nSELECT * from cart_items;\nSTART TRANSACTION;\nDELETE FROM cart_items WHERE id = 'e6ecab64-6c86-11f1-8d71-2c9c583aa7d0';\n\nSELECT * from cart_items;\nROLLBACK;\nSELECT * FROM cart_items;\nCOMMIT;\n",
+    "content": "\\about\nshow DATABASES;\nuse pc_ecommerce;\nshow tables;\nCREATE TABLE cart (\n  id          CHAR(36)    NOT NULL DEFAULT (UUID()),\n  user_id     CHAR(36)    NOT NULL,\n  created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\n  PRIMARY KEY (id),\n  UNIQUE KEY uq_cart_user_id (user_id),\n  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE\n);\nCREATE TABLE cart_items (\n  id          CHAR(36)        NOT NULL DEFAULT (UUID()),\n  cart_id     CHAR(36)        NOT NULL,\n  product_id  CHAR(36)        NOT NULL,\n  quantity    INT UNSIGNED    NOT NULL DEFAULT 1,\n  added_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\n  PRIMARY KEY (id),\n  UNIQUE KEY uq_cart_product (cart_id, product_id),\n  FOREIGN KEY (cart_id) REFERENCES cart(id) ON DELETE CASCADE,\n  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,\n  INDEX idx_cart_items_cart_id (cart_id),\n  INDEX idx_cart_items_product_id (product_id),\n\n  CHECK (quantity > 0)\n);\nshow tables;\ndesc cart;\ndesc cart_items;\nSELECT * from users limit 10 OFFSET 0;\nSELECT id FROM cart WHERE user_id = '02416024-162f-49c1-9b1e-001398b39474';\n\nSELECT COUNT(*) AS total_customers FROM users WHERE role = 'customer';\nINSERT INTO cart (id, user_id)\nSELECT UUID(), id\nFROM users\nWHERE role = 'customer'\n  AND deleted_at IS NULL\n  AND id NOT IN (SELECT user_id FROM cart);\nSELECT COUNT(*) AS total_carts FROM cart;\nSELECT * from users where role='customer' and deleted_at IS NOT Null;\nSELECT * from cart;\nSELECT id AS cart_id, user_id FROM cart LIMIT 1;\nSELECT id AS product_id, name, price FROM products WHERE status = 'active' LIMIT 1;\n\nINSERT INTO cart_items (cart_id, product_id, quantity)\nVALUES ('cf2e79d8-6c84-11f1-8d71-2c9c583aa7d0', '000902be-a67f-4f87-b09d-5db7888e371d', 2);\nSELECT * from cart_items;\nSELECT\n  ci.id AS cart_item_id,\n  p.name,\n  p.thumbnail_url,\n  ci.quantity,\n  COALESCE(p.discount_price, p.price) AS unit_price,\n  ci.quantity * COALESCE(p.discount_price, p.price) AS total_amount\nFROM cart_items ci\nJOIN products p ON ci.product_id = p.id\nWHERE ci.cart_id = 'cf2e79d8-6c84-11f1-8d71-2c9c583aa7d0';\nSELECT COUNT(*) AS total_cart_items FROM cart_items;\nSELECT * FROM cart_items WHERE quantity > 1;\nSELECT SUM(quantity) AS total_units_in_carts FROM cart_items;\nUPDATE cart_items SET quantity = 3 WHERE id = 'e6ecab64-6c86-11f1-8d71-2c9c583aa7d0';\n\nSELECT * from cart_items;\nSTART TRANSACTION;\nDELETE FROM cart_items WHERE id = 'e6ecab64-6c86-11f1-8d71-2c9c583aa7d0';\n\nSELECT * from cart_items;\nROLLBACK;\nSELECT * FROM cart_items;\nCOMMIT;\nshow tables;\nuse pc_ecommerce;\nshow tables;\n",
     "options": {
         "tabSize": 4,
         "indentSize": 4,
@@ -15,22 +15,22 @@
             {
                 "inSelectionMode": false,
                 "selectionStart": {
-                    "lineNumber": 74,
-                    "column": 10
+                    "lineNumber": 80,
+                    "column": 1
                 },
                 "position": {
-                    "lineNumber": 74,
-                    "column": 10
+                    "lineNumber": 80,
+                    "column": 1
                 }
             }
         ],
         "viewState": {
             "scrollLeft": 0,
             "firstPosition": {
-                "lineNumber": 67,
+                "lineNumber": 73,
                 "column": 1
             },
-            "firstPositionDeltaTop": -13
+            "firstPositionDeltaTop": -2
         },
         "contributionsState": {
             "editor.contrib.folding": {},
@@ -77,7 +77,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4612edde-d50b-488a-ab72-6553a5ba6ef5"
+                        "627471d1-15a0-429a-a49b-e54e4f320d45"
                     ]
                 },
                 "currentHeight": 36,
@@ -96,8 +96,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "4612edde-d50b-488a-ab72-6553a5ba6ef5",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "627471d1-15a0-429a-a49b-e54e4f320d45",
                     "rows": [
                         {
                             "0": "attendance_app"
@@ -256,7 +256,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d6d6476e-11fa-4e99-d664-edb94fe16fa4"
+                        "d9105063-0511-45c1-e81b-bfbb23d2e248"
                     ]
                 },
                 "currentHeight": 36,
@@ -275,8 +275,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "d6d6476e-11fa-4e99-d664-edb94fe16fa4",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "d9105063-0511-45c1-e81b-bfbb23d2e248",
                     "rows": [
                         {
                             "0": "products"
@@ -389,7 +389,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "23d735eb-42e3-499d-c6f8-f02b58eadcf6"
+                        "a0217f15-01e1-4fec-b8d4-435628ce2919"
                     ]
                 },
                 "currentHeight": 36,
@@ -408,8 +408,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "23d735eb-42e3-499d-c6f8-f02b58eadcf6",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "a0217f15-01e1-4fec-b8d4-435628ce2919",
                     "rows": [
                         {
                             "0": "cart"
@@ -464,7 +464,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "72945753-a563-43a7-8a79-68747df4bcd8"
+                        "5c6dc138-25ae-44bf-bfa3-569e8455e2e6"
                     ]
                 },
                 "currentHeight": 36,
@@ -492,8 +492,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "72945753-a563-43a7-8a79-68747df4bcd8",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "5c6dc138-25ae-44bf-bfa3-569e8455e2e6",
                     "rows": [
                         {
                             "0": "id",
@@ -651,7 +651,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ad7cc530-1b36-4350-9dcf-c4f1e9f1d705"
+                        "0cf95b80-1cd8-4e1e-d7b6-7eed09452229"
                     ]
                 },
                 "currentHeight": 36,
@@ -670,8 +670,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "ad7cc530-1b36-4350-9dcf-c4f1e9f1d705",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "0cf95b80-1cd8-4e1e-d7b6-7eed09452229",
                     "rows": [
                         {
                             "0": "id",
@@ -845,7 +845,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "8ada0009-6801-46e8-a832-0e9564b6d78a"
+                        "c5e939ca-9946-4284-988c-572bb8b4e712"
                     ]
                 },
                 "currentHeight": 36,
@@ -864,8 +864,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "8ada0009-6801-46e8-a832-0e9564b6d78a",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "c5e939ca-9946-4284-988c-572bb8b4e712",
                     "rows": [
                         {
                             "0": "02416024-162f-49c1-9b1e-001398b39474",
@@ -1282,13 +1282,6 @@
                 "start": 36,
                 "end": 37,
                 "language": "mysql",
-                "result": {
-                    "type": "resultIds",
-                    "list": [
-                        "d1a915b3-a082-4da9-a8de-c40884f8f377"
-                    ]
-                },
-                "currentHeight": 36,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -1311,96 +1304,7 @@
                     }
                 ]
             },
-            "data": [
-                {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "d1a915b3-a082-4da9-a8de-c40884f8f377",
-                    "rows": [],
-                    "columns": [
-                        {
-                            "title": "id",
-                            "field": "0",
-                            "dataType": {
-                                "type": 13,
-                                "characterMaximumLength": 255,
-                                "flags": [
-                                    "BINARY",
-                                    "UNICODE",
-                                    "ASCII"
-                                ],
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero",
-                                "synonyms": [
-                                    "CHARACTER"
-                                ]
-                            },
-                            "inPK": true,
-                            "nullable": false,
-                            "autoIncrement": false,
-                            "default": "uuid()"
-                        },
-                        {
-                            "title": "user_id",
-                            "field": "1",
-                            "dataType": {
-                                "type": 13,
-                                "characterMaximumLength": 255,
-                                "flags": [
-                                    "BINARY",
-                                    "UNICODE",
-                                    "ASCII"
-                                ],
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero",
-                                "synonyms": [
-                                    "CHARACTER"
-                                ]
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false
-                        },
-                        {
-                            "title": "created_at",
-                            "field": "2",
-                            "dataType": {
-                                "type": 26,
-                                "dateTimePrecision": 4,
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero"
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false,
-                            "default": "CURRENT_TIMESTAMP"
-                        },
-                        {
-                            "title": "updated_at",
-                            "field": "3",
-                            "dataType": {
-                                "type": 26,
-                                "dateTimePrecision": 4,
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero"
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false,
-                            "default": "CURRENT_TIMESTAMP"
-                        }
-                    ],
-                    "executionInfo": {
-                        "text": "OK, 0 records retrieved in 4.831ms"
-                    },
-                    "totalRowCount": 0,
-                    "hasMoreRows": false,
-                    "currentPage": 0,
-                    "index": 0,
-                    "sql": "SELECT id FROM cart WHERE user_id = '02416024-162f-49c1-9b1e-001398b39474'",
-                    "updatable": true,
-                    "fullTableName": "cart"
-                }
-            ]
+            "data": []
         },
         {
             "state": {
@@ -1410,7 +1314,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "7518d11e-aacb-44e0-e61c-f3cdc031255b"
+                        "d3e81627-1e26-4626-f117-1049731d1509"
                     ]
                 },
                 "currentHeight": 36,
@@ -1429,8 +1333,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "7518d11e-aacb-44e0-e61c-f3cdc031255b",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "d3e81627-1e26-4626-f117-1049731d1509",
                     "rows": [
                         {
                             "0": 170
@@ -1511,7 +1415,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "d51dcd0f-cd34-4804-a338-a2068eeb7ac8"
+                        "517301e1-4894-4109-95c6-2612ad28ac3e"
                     ]
                 },
                 "currentHeight": 36,
@@ -1530,8 +1434,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "d51dcd0f-cd34-4804-a338-a2068eeb7ac8",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "517301e1-4894-4109-95c6-2612ad28ac3e",
                     "rows": [
                         {
                             "0": 164
@@ -1580,7 +1484,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e555c9c8-d373-4f8c-e269-0826d0018354"
+                        "d32c6898-408e-43d2-9f7b-60be8534451f"
                     ]
                 },
                 "currentHeight": 36,
@@ -1599,8 +1503,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "e555c9c8-d373-4f8c-e269-0826d0018354",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "d32c6898-408e-43d2-9f7b-60be8534451f",
                     "rows": [
                         {
                             "0": "bba4e894-7e52-4fe7-adbe-a55fb368151c",
@@ -1956,7 +1860,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "3e8b0b6e-b456-4391-c9f3-8fc1a2f8ca16"
+                        "79af250b-ceb8-4750-b4be-ef38d7061860"
                     ]
                 },
                 "currentHeight": 36,
@@ -1975,8 +1879,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "3e8b0b6e-b456-4391-c9f3-8fc1a2f8ca16",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "79af250b-ceb8-4750-b4be-ef38d7061860",
                     "rows": [
                         {
                             "0": "cf2e79d8-6c84-11f1-8d71-2c9c583aa7d0",
@@ -3051,7 +2955,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "e6d236e9-5a26-42fc-e903-ca781ddfe3f7"
+                        "d34b2e41-3fcb-49bf-e85c-d5434e02226a"
                     ]
                 },
                 "currentHeight": 36,
@@ -3079,8 +2983,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "e6d236e9-5a26-42fc-e903-ca781ddfe3f7",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "d34b2e41-3fcb-49bf-e85c-d5434e02226a",
                     "rows": [
                         {
                             "0": "cf2e79d8-6c84-11f1-8d71-2c9c583aa7d0",
@@ -3146,7 +3050,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "59e68694-b8f9-4188-e431-f8cb6d110ef2"
+                        "8715dd22-f555-412a-9b0e-027e77e169c9"
                     ]
                 },
                 "currentHeight": 36,
@@ -3174,8 +3078,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "59e68694-b8f9-4188-e431-f8cb6d110ef2",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "8715dd22-f555-412a-9b0e-027e77e169c9",
                     "rows": [
                         {
                             "0": "000902be-a67f-4f87-b09d-5db7888e371d",
@@ -3296,7 +3200,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "2a7a340f-6b61-4a03-c71f-99867ba0c970"
+                        "2c6a2e87-47bf-4f26-e206-4370d5363ab0"
                     ]
                 },
                 "currentHeight": 36,
@@ -3315,8 +3219,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "2a7a340f-6b61-4a03-c71f-99867ba0c970",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "2c6a2e87-47bf-4f26-e206-4370d5363ab0",
                     "rows": [
                         {
                             "0": "e6ecab64-6c86-11f1-8d71-2c9c583aa7d0",
@@ -3454,7 +3358,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "69a7d4ef-a17c-4b70-c016-339a149019c2"
+                        "9d55c1b9-fba1-44ad-fac8-1e0cf553652d"
                     ]
                 },
                 "currentHeight": 36,
@@ -3473,8 +3377,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "69a7d4ef-a17c-4b70-c016-339a149019c2",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "9d55c1b9-fba1-44ad-fac8-1e0cf553652d",
                     "rows": [
                         {
                             "0": "e6ecab64-6c86-11f1-8d71-2c9c583aa7d0",
@@ -3626,7 +3530,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "345d7cf6-bf0f-4942-eafc-36875ecea9d0"
+                        "ebade6ee-9b1e-4903-c205-e42d2bf3468a"
                     ]
                 },
                 "currentHeight": 36,
@@ -3654,8 +3558,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "345d7cf6-bf0f-4942-eafc-36875ecea9d0",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "ebade6ee-9b1e-4903-c205-e42d2bf3468a",
                     "rows": [
                         {
                             "0": 1
@@ -3704,7 +3608,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "43f7cf8d-c017-45d2-ac0a-b6ef379f4c16"
+                        "71259da9-aa64-49b6-f48d-6995d1219696"
                     ]
                 },
                 "currentHeight": 36,
@@ -3732,8 +3636,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "43f7cf8d-c017-45d2-ac0a-b6ef379f4c16",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "71259da9-aa64-49b6-f48d-6995d1219696",
                     "rows": [
                         {
                             "0": "e6ecab64-6c86-11f1-8d71-2c9c583aa7d0",
@@ -3871,7 +3775,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "ca9c6d1d-0dfb-4b04-c5d3-4f5e108eb5be"
+                        "ac8b8f6e-aefa-4bbb-a30b-47fc7522cbde"
                     ]
                 },
                 "currentHeight": 36,
@@ -3899,8 +3803,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "ca9c6d1d-0dfb-4b04-c5d3-4f5e108eb5be",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "ac8b8f6e-aefa-4bbb-a30b-47fc7522cbde",
                     "rows": [
                         {
                             "0": "2"
@@ -3992,7 +3896,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "4ae76ebe-e854-468a-e902-89c2c9e3f07b"
+                        "b044fce0-c9d9-4d66-dc6d-2f935418f6d9"
                     ]
                 },
                 "currentHeight": 103.60000610351562,
@@ -4011,8 +3915,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "4ae76ebe-e854-468a-e902-89c2c9e3f07b",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "b044fce0-c9d9-4d66-dc6d-2f935418f6d9",
                     "rows": [
                         {
                             "0": "e6ecab64-6c86-11f1-8d71-2c9c583aa7d0",
@@ -4220,13 +4124,6 @@
                 "start": 73,
                 "end": 73,
                 "language": "mysql",
-                "result": {
-                    "type": "resultIds",
-                    "list": [
-                        "12af5fd2-feef-4a2d-aadb-d97cb6eaade2"
-                    ]
-                },
-                "currentHeight": 85.390625,
                 "currentSet": 1,
                 "statements": [
                     {
@@ -4240,138 +4137,7 @@
                     }
                 ]
             },
-            "data": [
-                {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "12af5fd2-feef-4a2d-aadb-d97cb6eaade2",
-                    "rows": [],
-                    "columns": [
-                        {
-                            "title": "id",
-                            "field": "0",
-                            "dataType": {
-                                "type": 13,
-                                "characterMaximumLength": 255,
-                                "flags": [
-                                    "BINARY",
-                                    "UNICODE",
-                                    "ASCII"
-                                ],
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero",
-                                "synonyms": [
-                                    "CHARACTER"
-                                ]
-                            },
-                            "inPK": true,
-                            "nullable": false,
-                            "autoIncrement": false,
-                            "default": "uuid()"
-                        },
-                        {
-                            "title": "cart_id",
-                            "field": "1",
-                            "dataType": {
-                                "type": 13,
-                                "characterMaximumLength": 255,
-                                "flags": [
-                                    "BINARY",
-                                    "UNICODE",
-                                    "ASCII"
-                                ],
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero",
-                                "synonyms": [
-                                    "CHARACTER"
-                                ]
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false
-                        },
-                        {
-                            "title": "product_id",
-                            "field": "2",
-                            "dataType": {
-                                "type": 13,
-                                "characterMaximumLength": 255,
-                                "flags": [
-                                    "BINARY",
-                                    "UNICODE",
-                                    "ASCII"
-                                ],
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero",
-                                "synonyms": [
-                                    "CHARACTER"
-                                ]
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false
-                        },
-                        {
-                            "title": "quantity",
-                            "field": "3",
-                            "dataType": {
-                                "type": 4,
-                                "flags": [
-                                    "SIGNED",
-                                    "ZEROFILL"
-                                ],
-                                "numericPrecision": 10,
-                                "parameterFormatType": "OneOrZero",
-                                "synonyms": [
-                                    "INTEGER",
-                                    "INT4"
-                                ]
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false,
-                            "default": "1"
-                        },
-                        {
-                            "title": "added_at",
-                            "field": "4",
-                            "dataType": {
-                                "type": 26,
-                                "dateTimePrecision": 4,
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero"
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false,
-                            "default": "CURRENT_TIMESTAMP"
-                        },
-                        {
-                            "title": "updated_at",
-                            "field": "5",
-                            "dataType": {
-                                "type": 26,
-                                "dateTimePrecision": 4,
-                                "needsQuotes": true,
-                                "parameterFormatType": "OneOrZero"
-                            },
-                            "inPK": false,
-                            "nullable": false,
-                            "autoIncrement": false,
-                            "default": "CURRENT_TIMESTAMP"
-                        }
-                    ],
-                    "executionInfo": {
-                        "text": "OK, 0 records retrieved in 1.572ms"
-                    },
-                    "totalRowCount": 0,
-                    "hasMoreRows": false,
-                    "currentPage": 0,
-                    "index": 0,
-                    "sql": "SELECT * from cart_items",
-                    "updatable": true,
-                    "fullTableName": "cart_items"
-                }
-            ]
+            "data": []
         },
         {
             "state": {
@@ -4413,7 +4179,7 @@
                 "result": {
                     "type": "resultIds",
                     "list": [
-                        "b8c18273-574f-4dd7-e152-1857825f1e67"
+                        "9fb08465-b1dd-40f4-c9d9-0367724e26e0"
                     ]
                 },
                 "currentHeight": 106,
@@ -4432,8 +4198,8 @@
             },
             "data": [
                 {
-                    "tabId": "6b5174a6-a80e-4b9e-f9bf-b69ef4acdf8b",
-                    "resultId": "b8c18273-574f-4dd7-e152-1857825f1e67",
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "9fb08465-b1dd-40f4-c9d9-0367724e26e0",
                     "rows": [
                         {
                             "0": "e6ecab64-6c86-11f1-8d71-2c9c583aa7d0",
@@ -4599,6 +4365,148 @@
             "state": {
                 "start": 77,
                 "end": 77,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 0,
+                            "index": 0,
+                            "content": "MySQL Error (1046): No database selected",
+                            "language": "ansi"
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": ""
+                    }
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 12
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 78,
+                "end": 78,
+                "language": "mysql",
+                "result": {
+                    "type": "text",
+                    "text": [
+                        {
+                            "type": 2,
+                            "index": 0,
+                            "resultId": "f9a972ff-4441-46e8-cb96-0fc19f31807b",
+                            "content": "OK, 0 records retrieved in 5.89ms"
+                        }
+                    ]
+                },
+                "currentHeight": 28,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 17
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": []
+        },
+        {
+            "state": {
+                "start": 79,
+                "end": 79,
+                "language": "mysql",
+                "result": {
+                    "type": "resultIds",
+                    "list": [
+                        "a972bd6a-6481-4419-a5f8-9282f79d820a"
+                    ]
+                },
+                "currentHeight": 162.1875,
+                "currentSet": 1,
+                "statements": [
+                    {
+                        "delimiter": ";",
+                        "span": {
+                            "start": 0,
+                            "length": 12
+                        },
+                        "contentStart": 0,
+                        "state": 0
+                    }
+                ]
+            },
+            "data": [
+                {
+                    "tabId": "eaeba24a-5d9a-496e-f844-784a1144b2df",
+                    "resultId": "a972bd6a-6481-4419-a5f8-9282f79d820a",
+                    "rows": [
+                        {
+                            "0": "cart"
+                        },
+                        {
+                            "0": "cart_items"
+                        },
+                        {
+                            "0": "products"
+                        },
+                        {
+                            "0": "users"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "title": "Tables_in_pc_ecommerce",
+                            "field": "0",
+                            "dataType": {
+                                "type": 17,
+                                "characterMaximumLength": 65535,
+                                "flags": [
+                                    "BINARY",
+                                    "ASCII",
+                                    "UNICODE"
+                                ],
+                                "needsQuotes": true,
+                                "parameterFormatType": "OneOrZero"
+                            },
+                            "inPK": false,
+                            "nullable": false,
+                            "autoIncrement": false
+                        }
+                    ],
+                    "executionInfo": {
+                        "text": "OK, 4 records retrieved in 8.999ms"
+                    },
+                    "totalRowCount": 4,
+                    "hasMoreRows": false,
+                    "currentPage": 0,
+                    "index": 0,
+                    "sql": "show tables",
+                    "updatable": false
+                }
+            ]
+        },
+        {
+            "state": {
+                "start": 80,
+                "end": 80,
                 "language": "mysql",
                 "currentSet": 1,
                 "statements": [
